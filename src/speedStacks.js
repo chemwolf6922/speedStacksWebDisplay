@@ -38,6 +38,7 @@ export class SpeedStacks{
             if(done){
                 this.onReaderClosed?.();
                 this.#reader.releaseLock();
+                console.log('reader closed');
                 break;
             }
             let allData = new Uint8Array(dataRemain.length+value.length);
@@ -45,17 +46,21 @@ export class SpeedStacks{
             allData.set(value,dataRemain.length);
             let cutoff = 0;
             for(let i=0;i<allData.length-1;i++){
-                if(allData[i]==='\r'.charCodeAt(0)&&allData[i+1]==='\n'.charCodeAt(0)){
+                if(allData[i]==='\n'.charCodeAt(0)&&allData[i+1]==='\r'.charCodeAt(0)){
                     if(i>=8){
+                        console.log(allData);
+                        console.log(allData.length,String.fromCharCode(...allData));
                         try {
                             let packet = allData.slice(i-8,i+2);
                             this.#checkPacket(packet);
                             let state = String.fromCharCode(packet[0]);
                             let display = String.fromCharCode(...packet.slice(1,7));
                             this.onMessage?.({state,display});
-                        } catch (error) {}
+                        } catch (error) {
+                            console.log(error);
+                        }
                     }
-                    cutoff = i+1;
+                    cutoff = i+2;
                 }
             }
             dataRemain = allData.slice(cutoff);
@@ -70,9 +75,9 @@ export class SpeedStacks{
         if(raw.length!==PACKET_LENGTH){
             throw new Error('Wrong packet length');
         }
-        let sum = 0;
-        for(let i=0;i<7;i++){
-            sum += raw[i];
+        let sum = 64;
+        for(let i=1;i<7;i++){
+            sum += raw[i]-'0'.charCodeAt(0);
         }
         sum &= 0xFF;
         if(sum !== raw[7]){
