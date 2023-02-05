@@ -1,16 +1,16 @@
 // @ts-check
 import './App.css';
 import React from 'react';
-import { SpeedStacks } from './speedStacks.js';
+import { StackMat } from './stackMat';
 import { AudioSerial } from './audioSerial';
 
 class App extends React.Component {
-    /** @type {SpeedStacks} */
-    #speedStacks;
+    /** @type {StackMat} */
+    #stackMat;
 
     state = {
         connected:false,
-        state:SpeedStacks.STATE.IDLE,
+        state:StackMat.STATE.IDLE,
         display:'000000'
     };
 
@@ -23,9 +23,9 @@ class App extends React.Component {
         await port.open({baudRate:1200});
         console.log('Serial port opened');
         const reader = port.readable.getReader();
-        this.#speedStacks = new SpeedStacks({reader});
-        this.#speedStacks.onMessage = this.onMessage.bind(this);
-        this.#speedStacks.onReaderClosed = this.onReaderClosed.bind(this);
+        this.#stackMat = new StackMat({reader});
+        this.#stackMat.onMessage = this.onMessage.bind(this);
+        this.#stackMat.onReaderClosed = this.onReaderClosed.bind(this);
         this.setState({connected:true});
     }
 
@@ -38,9 +38,9 @@ class App extends React.Component {
         /** @todo */
         console.log('Audio opened');
         const reader = port.readable.getReader();
-        this.#speedStacks = new SpeedStacks({reader});
-        this.#speedStacks.onMessage = this.onMessage.bind(this);
-        this.#speedStacks.onReaderClosed = this.onReaderClosed.bind(this);
+        this.#stackMat = new StackMat({reader});
+        this.#stackMat.onMessage = this.onMessage.bind(this);
+        this.#stackMat.onReaderClosed = this.onReaderClosed.bind(this);
         this.setState({connected:true});
     }
 
@@ -63,7 +63,7 @@ class App extends React.Component {
             <div className='App'>
                 <button onClick={this.onConnectSerialButtonClick.bind(this)} hidden={this.state.connected}>Connect serial</button>
                 <button onClick={this.onConnectAudioButtonClick.bind(this)} hidden={this.state.connected}>Connect audio</button>
-                <div className='warning' hidden={this.state.connected}>Connection using audio is not recommended. The speedstacks timer will mess with the system recording volume for its gigantic energy leak.</div>
+                <div className='warning' hidden={this.state.connected}>Connection using audio is not recommended. The stackMat timer may mess with the system recording volume.</div>
                 <div className='display'>{
                     `${this.state.display[0]}:${this.state.display.substring(1,3)}.${this.state.display.substring(3)}`
                 }</div>

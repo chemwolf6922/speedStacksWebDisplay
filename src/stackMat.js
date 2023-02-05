@@ -7,7 +7,7 @@
  */
 const PACKET_LENGTH=10;
 
-export class SpeedStacks{
+export class StackMat{
     static STATE = {
         RUNNING:' ',
         IDLE:'I',
